@@ -53,6 +53,12 @@ file(GLOB_RECURSE Hal_Sources
 	Drivers/STM32F1xx_HAL_Driver/Src/*.c
 	)
 
+file(GLOB_RECURSE SPL_Sources
+	Libraries/CMSIS/CM3/CoreSupport/*.c
+	Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x/*.c
+	Libraries/STM32F10x_StdPeriph_Driver/src/*.c
+	)
+
 set (PROJECT_SOURCES
 	# LIST SOURCE FILES HERE
 	Core/Startup/startup_stm32f103c8tx.s
@@ -74,7 +80,9 @@ set (PROJECT_INCLUDES
 	Drivers/STM32F1xx_HAL_Driver/Inc
 	Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
 	# Legacy SPL support:
-	Legacy/
+	Libraries/CMSIS/CM3/CoreSupport
+	Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x
+	Libraries/STM32F10x_StdPeriph_Driver/inc
     )
 
 ############ MODIFY ACCORDING TO REQUIREMENTS) ########################
