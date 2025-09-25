@@ -44,45 +44,51 @@ set (MFLOAT_ABI               "")
 set (RUNTIME_LIBRARY          "--specs=nano.specs")
 set (RUNTIME_LIBRARY_SYSCALLS "--specs=nosys.specs")
 
+file(GLOB Core_Startup
+	Core/Startup/startup_stm32f103c8tx.s
+)
+
 file(GLOB_RECURSE Core_Sources
 	Core/Src/*.c
 	Core/Src/*.cpp
 	)
 
-file(GLOB_RECURSE Hal_Sources
+file(GLOB_RECURSE HAL_Sources
 	Drivers/STM32F1xx_HAL_Driver/Src/*.c
-	)
-
-file(GLOB_RECURSE SPL_Sources
-	Libraries/CMSIS/CM3/CoreSupport/*.c
-	Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x/*.c
-	Libraries/STM32F10x_StdPeriph_Driver/src/*.c
 	)
 
 set (PROJECT_SOURCES
 	# LIST SOURCE FILES HERE
-	Core/Startup/startup_stm32f103c8tx.s
+	${Core_Startup}
 	${Core_Sources}
-	${Hal_Sources}
+	${HAL_Sources}
 	)
+
+set (HAL_Defines
+	# LIST HAL DRIVER DEFINITIONS HERE
+	# USE_HAL_DRIVER
+    USE_HAL_DRIVER
+    STM32F103xB
+)
 
 set (PROJECT_DEFINES
 	# LIST COMPILER DEFINITIONS HERE
-	USE_HAL_DRIVER
-	STM32F103xB
-    )
+	USE_FULL_ASSERT
+	${HAL_Defines}
+	)
+
+set (HAL_Includes
+	# LIST HAL DRIVER INCLUDE DIRECTORIES HERE
+    Drivers/CMSIS/Include
+    Drivers/CMSIS/Device/ST/STM32F1xx/Include
+    Drivers/STM32F1xx_HAL_Driver/Inc
+    Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
+	)
 
 set (PROJECT_INCLUDES
 	# LIST INCLUDE DIRECTORIES HERE
 	Core/Inc
-	Drivers/CMSIS/Include
-	Drivers/CMSIS/Device/ST/STM32F1xx/Include
-	Drivers/STM32F1xx_HAL_Driver/Inc
-	Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
-	# Legacy SPL support:
-	Libraries/CMSIS/CM3/CoreSupport
-	Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x
-	Libraries/STM32F10x_StdPeriph_Driver/inc
+	${HAL_Includes}
     )
 
 ############ MODIFY ACCORDING TO REQUIREMENTS) ########################
