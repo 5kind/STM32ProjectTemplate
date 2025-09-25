@@ -57,10 +57,6 @@ file(GLOB_RECURSE Core_Sources
 	Core/Src/*.cpp
 	)
 
-file(GLOB_RECURSE HAL_Sources
-	Drivers/STM32F1xx_HAL_Driver/Src/*.c
-	)
-
 file(GLOB_RECURSE SPL_Sources
 	# Incompatible with newer versions of GCC, 
 	# see Core/Src/core_cm3.c for replacement.
@@ -71,19 +67,11 @@ file(GLOB_RECURSE SPL_Sources
 
 set (PROJECT_SOURCES
 	# LIST SOURCE FILES HERE
-	# ${Core_Startup}
-	${SPL_Startup}
+	${Core_Startup}
+	# ${SPL_Startup}
 	${Core_Sources}
-	# ${HAL_Sources}
 	${SPL_Sources}
 	)
-
-set (HAL_Defines
-	# LIST HAL DRIVER DEFINITIONS HERE
-	# USE_HAL_DRIVER
-    USE_HAL_DRIVER
-    STM32F103xB
-)
 
 set (SPL_Defines
 	# LIST SPL DRIVER DEFINITIONS HERE
@@ -97,14 +85,6 @@ set (PROJECT_DEFINES
 	# USE_FULL_ASSERT
 	# ${HAL_Defines}
 	${SPL_Defines}
-	)
-
-set (HAL_Includes
-	# LIST HAL DRIVER INCLUDE DIRECTORIES HERE
-    Drivers/CMSIS/Include
-    Drivers/CMSIS/Device/ST/STM32F1xx/Include
-    Drivers/STM32F1xx_HAL_Driver/Inc
-    Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
 	)
 
 set (SPL_Includes
