@@ -1,0 +1,1 @@
+../../Project/STM32F10x_StdPeriph_Template/stm32f10x_conf.h
