@@ -1,127 +1,68 @@
-#############################################################################################################################
-# file:  CMakeLists.txt
-# brief: Template "CMakeLists.txt" for building of executables and static libraries.
+cmake_minimum_required(VERSION 3.22)
+
 #
-# usage: Edit "VARIABLES"-section to suit project requirements.
-#        For debug build:
-#          cmake -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Debug -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
-#          make -C Debug VERBOSE=1 -j
-#        For release build:
-#          cmake -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
-#          make -C Release VERBOSE=1 -j
-#############################################################################################################################
-cmake_minimum_required(VERSION 3.20)
+# This file is generated only once,
+# and is not re-generated if converter is called multiple times.
+#
+# User is free to modify the file as much as necessary
+#
 
-###################### CONSTANTS ######################################
-set (PROJECT_TYPE_EXECUTABLE          "exe")
-set (PROJECT_TYPE_STATIC_LIBRARY      "static-lib")
-set (MCPU_CORTEX_M0				      "-mcpu=cortex-m0")
-set (MCPU_CORTEX_M0PLUS				  "-mcpu=cortex-m0plus")
-set (MCPU_CORTEX_M3				      "-mcpu=cortex-m3")
-set (MCPU_CORTEX_M4				      "-mcpu=cortex-m4")
-set (MCPU_CORTEX_M7				      "-mcpu=cortex-m7")
-set (MCPU_CORTEX_M33				  "-mcpu=cortex-m33")
-set (MCPU_CORTEX_M55				  "-mcpu=cortex-m55")
-set (MCPU_CORTEX_M85				  "-mcpu=cortex-m85")
-set (MFPU_FPV4_SP_D16                 "-mfpu=fpv4-sp-d16")
-set (MFPU_FPV4                        "-mfpu=vfpv4")
-set (MFPU_FPV5_D16                    "-mfpu=fpv5-d16")
-set (RUNTIME_LIBRARY_REDUCED_C        "--specs=nano.specs")
-set (RUNTIME_LIBRARY_STD_C            "")
-set (RUNTIME_LIBRARY_SYSCALLS_MINIMAL "--specs=nosys.specs")
-set (RUNTIME_LIBRARY_SYSCALLS_NONE    "")
-set (MFLOAT_ABI_SOFTWARE              "-mfloat-abi=soft")
-set (MFLOAT_ABI_HARDWARE              "-mfloat-abi=hard")
-set (MFLOAT_ABI_MIX                   "-mfloat-abi=softfp")
-#######################################################################
+# Setup compiler settings
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
 
-###################### VARIABLES ######################################
-set (PROJECT_NAME             "Project")
-set (PROJECT_TYPE             "exe")
-set (LINKER_SCRIPT            "../STM32F103C8TX_FLASH.ld")
-set (MCPU                     "-mcpu=Cortex-M3")
-set (MFLOAT_ABI               "")
-set (RUNTIME_LIBRARY          "--specs=nano.specs")
-set (RUNTIME_LIBRARY_SYSCALLS "--specs=nosys.specs")
 
-file(GLOB Core_Startup
-	Core/Startup/startup_stm32f103c8tx.s
-)
-
-file(GLOB SPL_Startup
-	Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7/startup_stm32f10x_md.s
-)
-
-file(GLOB_RECURSE Core_Sources
-	Core/Src/*.c
-	Core/Src/*.cpp
-	)
-
-file(GLOB_RECURSE SPL_Sources
-	# Incompatible with newer versions of GCC, 
-	# see Core/Src/core_cm3.c for replacement.
-	# Libraries/CMSIS/CM3/CoreSupport/core_cm3.c
-	Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x/system_stm32f10x.c
-	Libraries/STM32F10x_StdPeriph_Driver/src/*.c
-	)
-
-set (PROJECT_SOURCES
-	# LIST SOURCE FILES HERE
-	${Core_Startup}
-	# ${SPL_Startup}
-	${Core_Sources}
-	${SPL_Sources}
-	)
-
-set (SPL_Defines
-	# LIST SPL DRIVER DEFINITIONS HERE
-	# STM32F10X_MD
-	USE_STDPERIPH_DRIVER
-	STM32F10X_MD
-	)
-
-set (PROJECT_DEFINES
-	# LIST COMPILER DEFINITIONS HERE
-	# USE_FULL_ASSERT
-	# ${HAL_Defines}
-	${SPL_Defines}
-	)
-
-set (SPL_Includes
-	Libraries/CMSIS/CM3/CoreSupport
-	Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x
-	Libraries/STM32F10x_StdPeriph_Driver/inc
-	)
-
-set (PROJECT_INCLUDES
-	# LIST INCLUDE DIRECTORIES HERE
-	Core/Inc
-	# ${HAL_Includes}
-	${SPL_Includes}
-    )
-
-############ MODIFY ACCORDING TO REQUIREMENTS) ########################
-
-#######################################################################
-
-################## PROJECT SETUP ######################################
-project(${PROJECT_NAME})
-enable_language(ASM)
-
-if (${PROJECT_TYPE} MATCHES ${PROJECT_TYPE_EXECUTABLE})
-  add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-  add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${CMAKE_PROJECT_NAME}>)
-elseif (${PROJECT_TYPE} MATCHES ${PROJECT_TYPE_STATIC_LIBRARY})
-  add_library(${PROJECT_NAME} ${PROJECT_SOURCES})
+# Define the build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-add_compile_definitions (${PROJECT_DEFINES})
-include_directories (${PROJECT_INCLUDES})
+# Set the project name
+set(CMAKE_PROJECT_NAME Project)
 
-set (CMAKE_EXECUTABLE_SUFFIX ".elf")
-set (CMAKE_STATIC_LIBRARY_SUFFIX ".a")
-set (CMAKE_C_FLAGS "${MCPU} -std=gnu11 ${MFPU} ${MFLOAT_ABI} ${RUNTIME_LIBRARY} -mthumb -Wall -Werror")
-set (CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} ${RUNTIME_LIBRARY_SYSCALLS} -Wl,-Map=test.map -Wl,--gc-sections -static -Wl,--start-group -lc -lm -Wl,--end-group")
-set (CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -x assembler-with-cpp")
-# CMake Tools:
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# Enable compile command to ease indexing with e.g. clangd
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
+# Core project settings
+project(${CMAKE_PROJECT_NAME})
+message("Build type: " ${CMAKE_BUILD_TYPE})
+
+# Enable CMake support for ASM and C languages
+enable_language(C ASM)
+
+# Create an executable object type
+add_executable(${CMAKE_PROJECT_NAME})
+
+# Add STM32CubeMX generated sources
+add_subdirectory(cmake/stm32cubemx)
+
+# Link directories setup
+target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user defined library search paths
+)
+
+# Add sources to executable
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user sources here
+)
+
+# Add include paths
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user defined include paths
+)
+
+# Add project symbols (macros)
+target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user defined symbols
+)
+
+# Remove wrong libob.a library dependency when using cpp files
+list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)
+
+# Add linked libraries
+target_link_libraries(${CMAKE_PROJECT_NAME}
+    stm32cubemx
+
+    # Add user defined libraries
+)
